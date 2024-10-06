@@ -1,10 +1,13 @@
 package code;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 public class Minesweeper {
 	//https://stackoverflow.com/questions/6802483/how-to-directly-initialize-a-hashmap-in-a-literal-way
@@ -25,6 +28,8 @@ public class Minesweeper {
 	private int myRows;
 	private int myCols;
 	
+
+	
 	public Minesweeper() {
 		// TODO Auto-generated constructor stub
 	}
@@ -40,6 +45,38 @@ public class Minesweeper {
 //		testBoard.printHintsBoard();
 
 	}
+
+	public final void saveBoard(char[][] board, String boardType) {
+		Map<String, String> keyMap = Map.of(
+				"hints","minesweeper_output.txt",
+				"mines","minesweeper_input.txt"
+				);
+		 try {
+			 	String boardKey = keyMap.get(boardType);
+	            File file = new File(boardKey);
+	            FileWriter writer = new FileWriter(file, true); 
+
+	            
+	            int cols = this.getCols();
+	            int rows = this.getRows();
+	            writer.write(rows + " " + cols	+ "\n");
+	            
+	            for (int i = 0; i < rows; i++) {
+	                for (int j = 0; j < cols; j++) {
+	                    writer.write(board[i][j]);
+	                }
+	                writer.write("\n");
+	            }
+	            writer.write("0 0\n");
+
+	            writer.close();
+	        } catch (IOException e) {
+	            System.out.println("An error occurred while writing to file.");
+	            e.printStackTrace();
+	        }
+		
+		
+	}
 	
 	private final boolean inRange(final int theNumber) {
 		return theNumber > 0 && theNumber < 101;
@@ -50,12 +87,24 @@ public class Minesweeper {
 	}
 	
 	private final void playMinesweeper() {
-		System.out.println("Enter an int for rows: ");
 		Scanner scanner = new Scanner(System.in);
-		final int rows = scanner.nextInt();
+		System.out.println("Enter an int for rows: ");
+		int rows = scanner.nextInt();
 		System.out.println("Enter an int for cols: ");
-		final int cols = scanner.nextInt();
+		int cols = scanner.nextInt();
+		System.out.println("Enter an int for percentage of mines: ");
+		int percentage = scanner.nextInt();
+		setRows(rows);
+		setCols(cols);
+		InputGenerator ig = new InputGenerator();
+		char[][] field = ig.generateInput(rows, cols, percentage);
+		this.setBoard(field);
+		this.printBoard(field);
+		char[][] currHintsBoard = this.produceHintsBoard(field);
+		this.printHintsBoard(currHintsBoard);
 		
+		this.saveBoard(currHintsBoard, "hints");
+		this.saveBoard(field, "mines");
 		
 	}
 	
@@ -176,7 +225,7 @@ public class Minesweeper {
 	}
 	
 	
-	private final void produceHintsBoard(final char[][] theMinefield){
+	private final char[][] produceHintsBoard(final char[][] theMinefield){
 		int neededRows = theMinefield.length;
 		int neededCols = theMinefield[0].length;
 		int rowsIdx = 0;
@@ -198,6 +247,7 @@ public class Minesweeper {
 			colsIdx = 0;
 		}
 		this.setHintsBoard(hintsBoard);
+		return hintsBoard;
 	}
 	
 	private final int getBoardsCountFromFile() {
@@ -220,6 +270,14 @@ public class Minesweeper {
 		}
 		
 		return result;
+	}
+	
+	private final int getRows() {
+		return Integer.valueOf(this.myRows);
+	}
+	
+	private final int getCols() {
+		return Integer.valueOf(this.myCols);
 	}
 	
 	private final void setBoard(final char[][] theBoard) {
@@ -259,6 +317,18 @@ public class Minesweeper {
 		}
 		System.out.println();
 	}
+	private final void printBoard(char[][] theBoard) {
+		System.out.println();
+		for(char[] currRow: theBoard) {
+			StringBuilder sb = new StringBuilder();
+			for(char currCol: currRow) {
+				sb.append(currCol);
+			}
+			System.out.println(sb);
+			sb.setLength(0);
+		}
+		System.out.println();
+	}
 	private final void printHintsBoard() {
 		System.out.println();
 		for(char[] currRow: this.myHintsBoard) {
@@ -271,6 +341,17 @@ public class Minesweeper {
 		}
 		System.out.println();
 	}
-	
+	private final void printHintsBoard(char[][] theBoard) {
+		System.out.println();
+		for(char[] currRow: theBoard) {
+			StringBuilder sb = new StringBuilder();
+			for(char currCol: currRow) {
+				sb.append(currCol);
+			}
+			System.out.println(sb);
+			sb.setLength(0);
+		}
+		System.out.println();
+	}
 
 }

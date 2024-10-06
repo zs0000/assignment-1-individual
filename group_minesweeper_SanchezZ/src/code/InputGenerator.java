@@ -86,4 +86,50 @@ public class InputGenerator {
 
         System.out.println("Minesweeper input generated and saved to minesweeper_input.txt.");
     }
+    
+    public final char[][] generateInput(final int theRows, final int theCols, final int thePercentage) {
+
+
+         // Validate input
+         if (theRows < 1 || theRows > 100) {
+             System.out.println("Invalid number of rows. Must be between 1 and 100.");
+             return null;
+         }
+
+         if (theCols < 1 || theCols > 100) {
+             System.out.println("Invalid number of columns. Must be between 1 and 100.");
+             return null;
+         }
+
+         if (thePercentage < 0 || thePercentage > 100) {
+             System.out.println("Invalid percentage. Must be between 0 and 100.");
+             return null;
+         }
+
+         // Compute number of mines
+         int totalCells = theRows * theCols;
+         int numMines = (int) Math.round(totalCells * thePercentage / 100.0);
+
+         // Initialize the field with safe spots
+         char[][] field = new char[theRows][theCols];
+         for (int i = 0; i < theRows; i++) {
+             for (int j = 0; j < theCols; j++) {
+                 field[i][j] = '.'; // Safe spot
+             }
+         }
+
+         // Randomly place mines
+         Random rand = new Random();
+         int minesPlaced = 0;
+         while (minesPlaced < numMines) {
+             int r = rand.nextInt(theRows);
+             int c = rand.nextInt(theCols);
+             if (field[r][c] != '*') {
+                 field[r][c] = '*';
+                 minesPlaced++;
+             }
+         }
+
+         return field;
+     }
 }
